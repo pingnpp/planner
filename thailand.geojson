@@ -1,0 +1,24 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [97.3430, 5.6290],
+              [105.6367, 5.6275],
+              [105.6367, 20.4159],
+              [97.3523, 20.4167],
+              [97.3430, 5.6290]
+            ]
+          ]
+        },
+        "properties": {
+          "name": "Thailand"
+        }
+      }
+    ]
+  }
+  
