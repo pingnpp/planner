@@ -17,54 +17,43 @@
 async function initMap() {
 
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-    const { Marker, AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    const { Marker, SymbolPath, AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     const map = await new Map(document.getElementById("map"), {
-        zoom: 9,
-        center: { lat: 14.182526, lng: 99.629110 },
+        zoom: 13, //9,
+        center: { lat: 13.745608688156873, lng: 100.53412051262357 },
         mapId: "63a6c0e6f43355c6",
     });
     const infoWindow = new InfoWindow();
 
-    fetch('train.json')
+    fetch('asset.json')
         .then(response => response.json())
         .then(data => {
-            data.train.forEach(({ name, lat, lng }, i) => {
-                const icon = document.createElement("div");
-                icon.innerHTML = '<i class="fa-solid fa-train-subway fa-xl"></i>';
-                const pin = new PinElement({
-                    glyph: icon,
-                    glyphColor: "#000",
-                    background: "#FFF",
-                    borderColor: "#000",
-                    scale: 1
-                });
-                // const marker = new Marker({
-                //     position: { lat: lat, lng: lng },
-                //     map: map,
-                //     title: 'Custom Icon Marker',
-                //     icon: {
-                //         scaledSize: new google.maps.Size(50, 50), // Adjust the size as needed
-                //         origin: new google.maps.Point(0, 0),
-                //         anchor: new google.maps.Point(25, 25)
-                        
-                // }});
+            data.asset.forEach(({ name, detail, position }, i) => {
                 const marker = new AdvancedMarkerElement({
-                    position: { lat: lat, lng: lng },
                     map,
+                    content: buildContent(detail),
+                    position: position,
                     title: name,
-                    content: pin.element,
-                    // icon: {
-                    //     url: "https://i.stack.imgur.com/PYAIJ.png",
-                    //     size: new google.maps.Size(36, 36),
-                    //     origin: new google.maps.Point(0, 0),
-                    //     anchor: new google.maps.Point(18, 18),
-                    //     scaledSize: new google.maps.Size(25, 25)
-                    //     }
+                    collisionBehavior: 'OPTIONAL_AND_HIDES_LOWER_PRIORITY'   
                 });
+
+
+
                 marker.addListener("click", () => {
-                    infoWindow.close();
-                    infoWindow.setContent(marker.title);
-                    infoWindow.open(marker.map, marker);
+                    if (marker.content.classList.contains("highlight")) {
+                        marker.content.classList.remove("highlight");
+                        return
+                    }
+                    document.querySelectorAll('.highlight').forEach((element) => {
+                        element.classList.remove('highlight');
+                        element.zIndex = null;
+                    });
+                    marker.content.classList.add("highlight");
+                    marker.zIndex = 1;
+                    // toggleHighlight(marker);
+                    // infoWindow.close();
+                    // infoWindow.setContent(marker.title);
+                    // infoWindow.open(marker.map, marker);
                 });
             });
         })
@@ -72,7 +61,7 @@ async function initMap() {
 
     // map.addListener("zoom_changed", () => {
     //     const zoom = map.getZoom();
-        
+
     //     if (zoom) {
     //         // Only show each marker above a certain zoom level.
     //         marker01.map = zoom > 14 ? map : null;
@@ -81,7 +70,61 @@ async function initMap() {
     //         marker04.map = zoom > 17 ? map : null;
     //     }
     //     });
-   
+
+}
+
+function toggleHighlight(markerView) {
+    if (markerView.content.classList.contains("highlight")) {
+        markerView.content.classList.remove("highlight");
+        return
+    }
+    document.querySelectorAll('.highlight').forEach((element) => {
+        element.classList.remove('highlight');
+        element.zIndex = null;
+    });
+    markerView.content.classList.add("highlight");
+    markerView.zIndex = 1;
+    // if (markerView.content.classList.contains("highlight")) {
+    //     markerView.content.classList.remove("highlight");
+    //     markerView.zIndex = null;
+    // } else {
+    //     markerView.content.classList.add("highlight");
+    //     markerView.zIndex = 1;
+    // }
+}
+
+function buildContent(property) {
+    const content = document.createElement("div");
+
+    content.classList.add("property");
+    content.innerHTML = `
+      <div class="icon">
+          <i aria-hidden="true" class="fa fa-icon fa-${property.type}" title="${property.type}"></i>
+          <span class="fa-sr-only">${property.type}</span>
+      </div>
+      <div class="details">
+          <div class="price">${property.price}</div>
+          <div class="address">${property.address}</div>
+          <div class="features">
+          <div>
+              <i aria-hidden="true" class="fa fa-bed fa-lg bed" title="bedroom"></i>
+              <span class="fa-sr-only">bedroom</span>
+              <span>${property.bed}</span>
+          </div>
+          <div>
+              <i aria-hidden="true" class="fa fa-bath fa-lg bath" title="bathroom"></i>
+              <span class="fa-sr-only">bathroom</span>
+              <span>${property.bath}</span>
+          </div>
+          <div>
+              <i aria-hidden="true" class="fa fa-ruler fa-lg size" title="size"></i>
+              <span class="fa-sr-only">size</span>
+              <span>${property.size} ft<sup>2</sup></span>
+          </div>
+          </div>
+      </div>
+      `;
+    return content;
 }
 
 window.initMap = initMap;
