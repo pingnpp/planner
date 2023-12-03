@@ -73,26 +73,6 @@ async function initMap() {
 
 }
 
-function toggleHighlight(markerView) {
-    if (markerView.content.classList.contains("highlight")) {
-        markerView.content.classList.remove("highlight");
-        return
-    }
-    document.querySelectorAll('.highlight').forEach((element) => {
-        element.classList.remove('highlight');
-        element.zIndex = null;
-    });
-    markerView.content.classList.add("highlight");
-    markerView.zIndex = 1;
-    // if (markerView.content.classList.contains("highlight")) {
-    //     markerView.content.classList.remove("highlight");
-    //     markerView.zIndex = null;
-    // } else {
-    //     markerView.content.classList.add("highlight");
-    //     markerView.zIndex = 1;
-    // }
-}
-
 function buildContent(property) {
     const content = document.createElement("div");
 
